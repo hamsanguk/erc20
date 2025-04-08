@@ -3,10 +3,11 @@ import { abi, address as contractAddress } from '../abis/Mytoken.json'; // Todo:
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
-const web3 = new Web3('http://127.0.0.1:7545'); // Ganache를 사용합니다.
-const privateKey = process.env.PRIVATE_KEY || '';
+const web3 = new Web3('HTTP://127.0.0.1:7545'); // Ganache를 사용합니다.
+const privateKey = process.env.PRIVATE_KEY_GANACHE || '';
 
 export const getChainId = async () => {
+
   return web3.eth.net.getId();
 };
 
@@ -29,37 +30,40 @@ export const getOwner = async () => {
 export const getContract = () => {
   // Todo: MyToken Contract 인스턴스를 리턴합니다. - new web3.eth.Contract(ABI, 컨트랙트 주소);
   // 이 후에 구현하는 컨트랙트 호출은 구현한 getContract를 사용합니다.
-  return;
+
+  return new web3.eth.Contract(abi, contractAddress);
 };
 
 export const totalSupply = async () => {
   // Todo: MyToken의 totalSupply 리턴 값을 리턴합니다.
-
-  return;
+  const contract = getContract();
+  const totalSupply = await contract.methods.totalSupply().call();
+  return totalSupply;
 };
 
 export const balanceOf = async (address: string) => {
   // Todo: 인자 address의 balanceOf 리턴 값을 리턴합니다.
 
-  return;
+  const balance = await getContract().methods.balanceOf(address).call();
+  return balance;
 };
 
 export const transfer = async (from: string, to: string, amount: number) => {
-  // Todo: transfer함수는 컨트랙트의 transfer 함수를 사용해서 from 주소에서 to 주소로 amount(wei 단위)의 토큰을 전송해야 하며, 그 값을 리턴해야 합니다.
-
-  return;
+  const contract = await getContract();
+  const transfer = await contract.methods.transfer(to, amount).send({ from });
+  return transfer;
 };
 
 export const approve = async (spender: string, amount: number) => {
-  //Todo: approve함수는 컨트랙트의 approve 함수를 호출하여 호출하는 주소에서 spender 주소로 amount(wei 단위)만큼 토큰의 권한을 승인해야 하며, 그을 리턴해야 합니다.
-
-  return;
+  const owner = await getOwner();
+  const approve = await getContract().methods.approve(spender, amount).send({ from: owner.address });
+  return approve;
 };
 
 export const allowance = async (owner: string, spender: string) => {
-  //Todo: allowance함수는 컨트랙트의 allowance 함수를 사용하여 owner가 spender에게 부여한 토큰의 양을 리턴해야 합니다.
-
-  return;
+  const contract = getContract();
+  const allowance = await contract.methods.allowance(owner, spender).call();
+  return allowance;
 };
 
 export const transferFrom = async (
@@ -68,7 +72,8 @@ export const transferFrom = async (
   to: string,
   amount: number
 ) => {
-  //Todo: transferFrom함수는 컨트랙트의 transferFrom 함수를 사용하여 승인을 받은 spender가 승인한 from 주소에서 to 주소로 amount(wei 단위)만큼 토큰을 전송해야 하며, 그을 리턴해야 합니다.
-
-  return;
+ 
+  return await getContract()
+  .methods.transferFrom(from, to, amount)
+  .send({ from: spender });
 };
