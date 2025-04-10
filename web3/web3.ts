@@ -3,7 +3,7 @@ import { abi, address as contractAddress } from '../abis/Mytoken.json'; // Todo:
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
-const web3 = new Web3('HTTP://127.0.0.1:7545'); // Ganache를 사용합니다.
+const web3 = new Web3('https://public-en-kairos.node.kaia.io'); 
 const privateKey = process.env.PRIVATE_KEY_GANACHE || '';
 
 export const getChainId = async () => {
